@@ -52,6 +52,7 @@ public class Customercontroller {
 	public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
 			Customer customer=custservice.getByEmail(loginRequest.getEmail());
 			if(customer.getEmail().equals(loginRequest.getEmail()) && customer.getPassword().equals(loginRequest.getPassword())){
+				System.out.println("Data Matched!!");
 				return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 			}
 			return ResponseEntity

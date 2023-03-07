@@ -34,7 +34,9 @@ public class CustomerServiceImpl implements CustomerService
 		return custrepo.findBycustomercid(cust_Id);
 	}
 
+	@Override
 	public Customer getByEmail(String email){
-		return custrepo.getByEmail(email);
+		Customer user=custrepo.findByEmail(email).get();
+		return user;
 	}
 }
