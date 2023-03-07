@@ -33,8 +33,8 @@ import com.journeyer .repository.RoleRepository;
 @RequestMapping("/api/auth")
 public class Customercontroller {
 	
-	@Autowired
-	AuthenticationManager authenticationManager;
+//	@Autowired
+//	AuthenticationManager authenticationManager;
 
 	@Autowired
 	Customerrepo userRepository;
@@ -45,8 +45,22 @@ public class Customercontroller {
 	
 	@Autowired
 	CustomerService custservice;
-	
-	
+
+
+
+	@PostMapping("/login")
+	public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+			Customer customer=custservice.getByEmail(loginRequest.getEmail());
+			if(customer.getEmail().equals(loginRequest.getEmail()) && customer.getPassword().equals(loginRequest.getPassword())){
+				return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+			}
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: Mobile Number is already taken!"));
+
+	}
+
+
 
 	//for checking
 	@GetMapping(value = "/customers") 
@@ -66,7 +80,7 @@ public class Customercontroller {
 	
 	//for signup
 	@PostMapping("/signup")
-	  public ResponseEntity<?> registerUser(@RequestBody Customer  customer) {
+	  public ResponseEntity<?> registerUser(@RequestBody SignupRequest  customer) {
 		
 		
 		 System.out.println("Hello");
@@ -86,14 +100,39 @@ public class Customercontroller {
 
 	    // Create new user's account
 	    Customer user = new Customer(customer.getFirstname(),customer.getLastname(),
-	    		customer.getEmail(),encoder.encode(customer.getPassword()),customer.getGender(),customer.getMobile(),customer.getDob()
+	    		customer.getEmail(),customer.getPassword(),customer.getGender(),customer.getMobile(),customer.getDob()
 	    		);
 	    	
 	    System.out.println(user);
-	   
-	    
-	    userRepository.save(user);
 
+
+
+		Set<String> strRoles = customer.getRole();
+		Set<Role> roles = new HashSet<>();
+
+		if (strRoles == null) {
+			Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+			roles.add(userRole);
+		} else {
+			strRoles.forEach(role -> {
+				switch (role) {
+					case "admin":
+						Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(adminRole);
+
+						break;
+					default:
+						Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(userRole);
+				}
+			});
+		}
+		user.setRoles(roles);
+		userRepository.save(user);
+		System.out.println("user data saved in database");
 	    return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	    
 	}	

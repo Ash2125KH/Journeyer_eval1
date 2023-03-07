@@ -21,6 +21,8 @@ public interface Customerrepo extends JpaRepository<Customer, Long>{
 	@Query(value = "from Customer c where Email=?1")
 	Optional<Customer> findByEmail(String email);
 
+	@Query(value = "from customer c where email=?1")
+	public Customer getByEmail(String email);
 	Boolean existsByMobile(String mobile);
 	Boolean existsByEmail(String email);
 }

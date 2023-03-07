@@ -3,6 +3,7 @@ package com.journeyer.Services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import com.journeyer.modal.Customer;
@@ -31,5 +32,9 @@ public class CustomerServiceImpl implements CustomerService
 	public Customer getcustomerbycustid(int cust_Id) {
 		// TODO Auto-generated method stub
 		return custrepo.findBycustomercid(cust_Id);
+	}
+
+	public Customer getByEmail(String email){
+		return custrepo.getByEmail(email);
 	}
 }
